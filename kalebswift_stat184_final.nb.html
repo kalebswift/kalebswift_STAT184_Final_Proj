@@ -1749,16 +1749,39 @@ summary {
 
 
 <!-- rnb-text-begin -->
+<p>import libraries here</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2RpIDwtIHJlYWQuY3N2KFwiMWQ0OGViYzItMDhjOC00ZjhiLWIyYTYtOWQyNTEzYjZmZGM4X0RhdGEuY3N2XCIsIGhlYWRlcj1UUlVFKVxuYGBgIn0= -->
-<pre class="r"><code>wdi &lt;- read.csv(&quot;1d48ebc2-08c8-4f8b-b2a6-9d2513b6fdc8_Data.csv&quot;, header=TRUE)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShEYXRhQ29tcHV0aW5nKVxuaW5zdGFsbC5wYWNrYWdlcyhcInBhcnR5XCIpXG5gYGAifQ== -->
+<pre class="r"><code>library(DataComputing)
+install.packages(&quot;party&quot;)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>load the data</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2RpX2RhdGEgPC0gcmVhZC5jc3YoXCIxZDQ4ZWJjMi0wOGM4LTRmOGItYjJhNi05ZDI1MTNiNmZkYzhfRGF0YS5jc3ZcIiwgaGVhZGVyPVRSVUUpXG5nc19kYXRhIDwtIHJlYWQuY3N2KFwiNWE3ZDNmZjgtZWExYi00MDk1LTljZmYtMWVhMTk4NzliMzdiX0RhdGEuY3N2XCIsIGhlYWRlcj1UUlVFKVxuYGBgIn0= -->
+<pre class="r"><code>wdi_data &lt;- read.csv(&quot;1d48ebc2-08c8-4f8b-b2a6-9d2513b6fdc8_Data.csv&quot;, header=TRUE)
+gs_data &lt;- read.csv(&quot;5a7d3ff8-ea1b-4095-9cff-1ea19879b37b_Data.csv&quot;, header=TRUE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>examine the number of rows in each</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2RpX2RhdGEgJT4lIG5hLm9taXQoKSAlPiUgbnJvdygpXG5gYGAifQ== -->
+<pre class="r"><code>wdi_data %&gt;% na.omit() %&gt;% nrow()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gd2RpX2RhdGEgJT4lIG5hLm9taXQoKSAlPiUgbnJvdygpIDogXG4gIGNvdWxkIG5vdCBmaW5kIGZ1bmN0aW9uIFwiJT4lXCJcbiJ9 -->
+<pre><code>Error in wdi_data %&gt;% na.omit() %&gt;% nrow() : 
+  could not find function &quot;%&gt;%&quot;</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7cn0NCndkaSA8LSByZWFkLmNzdigiMWQ0OGViYzItMDhjOC00ZjhiLWIyYTYtOWQyNTEzYjZmZGM4X0RhdGEuY3N2IiwgaGVhZGVyPVRSVUUpDQpgYGANCg0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQppbXBvcnQgbGlicmFyaWVzIGhlcmUNCg0KYGBge3J9DQpsaWJyYXJ5KERhdGFDb21wdXRpbmcpDQppbnN0YWxsLnBhY2thZ2VzKCJwYXJ0eSIpDQpgYGANCg0KDQoNCmxvYWQgdGhlIGRhdGENCg0KYGBge3J9DQp3ZGlfZGF0YSA8LSByZWFkLmNzdigiMWQ0OGViYzItMDhjOC00ZjhiLWIyYTYtOWQyNTEzYjZmZGM4X0RhdGEuY3N2IiwgaGVhZGVyPVRSVUUpDQpnc19kYXRhIDwtIHJlYWQuY3N2KCI1YTdkM2ZmOC1lYTFiLTQwOTUtOWNmZi0xZWExOTg3OWIzN2JfRGF0YS5jc3YiLCBoZWFkZXI9VFJVRSkNCg0KDQpgYGANCg0KZXhhbWluZSB0aGUgbnVtYmVyIG9mIHJvd3MgaW4gZWFjaA0KDQpgYGB7cn0NCndkaV9kYXRhICU+JSBuYS5vbWl0KCkgJT4lIG5yb3coKQ0KZ3NfZGF0YSAlPiUgbmEub21pdCgpICU+JSBucm93KCkNCmBgYA0KDQoNCg0KDQo=</div>
 
 
 

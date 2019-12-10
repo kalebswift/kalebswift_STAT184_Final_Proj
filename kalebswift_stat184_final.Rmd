@@ -3,7 +3,31 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+import libraries here
+
 ```{r}
-wdi <- read.csv("1d48ebc2-08c8-4f8b-b2a6-9d2513b6fdc8_Data.csv", header=TRUE)
+library(DataComputing)
+install.packages("party")
 ```
+
+
+
+load the data
+
+```{r}
+wdi_data <- read.csv("1d48ebc2-08c8-4f8b-b2a6-9d2513b6fdc8_Data.csv", header=TRUE)
+gs_data <- read.csv("5a7d3ff8-ea1b-4095-9cff-1ea19879b37b_Data.csv", header=TRUE)
+
+
+```
+
+examine the number of rows in each
+
+```{r}
+wdi_data %>% na.omit() %>% nrow()
+gs_data %>% na.omit() %>% nrow()
+```
+
+
+
 
