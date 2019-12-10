@@ -1,0 +1,9 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+wdi <- read.csv("1d48ebc2-08c8-4f8b-b2a6-9d2513b6fdc8_Data.csv", header=TRUE)
+```
+
