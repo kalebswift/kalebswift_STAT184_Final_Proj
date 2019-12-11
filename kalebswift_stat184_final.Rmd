@@ -39,38 +39,44 @@ gs <- gs_data %>%
   select(Country.Name, Series.Name, Series.Code, X2009..YR2009., X2010..YR2010., X2011..YR2011., X2012..YR2012., X2013..YR2013., X2014..YR2014., X2015..YR2015., X2016..YR2016., X2017..YR2017., X2018..YR2018.) %>%
   mutate(yr2009=X2009..YR2009., yr2010=X2010..YR2010., yr2011=X2011..YR2011., yr2012=X2012..YR2012., yr2013=X2013..YR2013., yr2014=X2014..YR2014., yr2015=X2015..YR2015., yr2016=X2016..YR2016., yr2017=X2017..YR2017., yr2018=X2018..YR2018., country=Country.Name, series=Series.Name, code=Series.Code) %>%
   select(country, series, code, yr2009, yr2010, yr2011, yr2012, yr2012, yr2013, yr2014, yr2014, yr2015, yr2016, yr2017, yr2018)
-
-wdi %>% group_by(series, code) %>% select(series, code) %>% summarise(count=n())
-gs %>% group_by(series, code) %>% select(series, code) %>% summarise(count=n())
 ```
 
 wrangle the data into a single table
 
 | code=="NY.GDP.MKTP.KD.ZG" | code=="SP.DYN.LE00.IN"
 ```{r}
-wdi_GDP <- wdi %>% filter(code=="NY.GDP.PCAP.PP.CD") %>%
+wdi_GDP <- wdi %>% 
+  filter(code=="NY.GDP.PCAP.PP.CD") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
-wdi_growth <- wdi %>% filter(code=="NY.GDP.MKTP.KD.ZG") %>%
+wdi_growth <- wdi %>% 
+  filter(code=="NY.GDP.MKTP.KD.ZG") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
-wdi_life <- wdi %>% filter(code=="SP.DYN.LE00.IN") %>%
+wdi_life <- wdi %>% 
+  filter(code=="SP.DYN.LE00.IN") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
-wdi_2 <- wdi_GDP %>% left_join(wdi_growth, by=c("country"="country", "yr"="yr")) %>% 
-  left_join(wdi_life, by=c("country"="country", "yr"="yr")) %>% mutate(year = as.numeric(substring(yr, 3))) %>%
+wdi_2 <- wdi_GDP %>% 
+  left_join(wdi_growth, by=c("country"="country", "yr"="yr")) %>% 
+  left_join(wdi_life, by=c("country"="country", "yr"="yr")) %>% 
+  mutate(year = as.numeric(substring(yr, 3))) %>%
   select(country, year, `GDP per capita, PPP (current international $)`, `GDP growth (annual %)`, `Life expectancy at birth, total (years)`)
 
-gs_contra <- gs %>% filter(code=="SP.DYN.CONM.ZS") %>%
+gs_contra <- gs %>% 
+  filter(code=="SP.DYN.CONM.ZS") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
-gs_femBach <- gs %>% filter(code=="SE.TER.CUAT.BA.FE.ZS") %>%
+gs_femBach <- gs %>% 
+  filter(code=="SE.TER.CUAT.BA.FE.ZS") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
-gs_maleBach <- gs %>% filter(code=="SE.TER.CUAT.BA.MA.ZS") %>%
+gs_maleBach <- gs %>% 
+  filter(code=="SE.TER.CUAT.BA.MA.ZS") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
-gs_labor <- gs %>% filter(code=="SL.TLF.CACT.FE.NE.ZS") %>%
+gs_labor <- gs %>% 
+  filter(code=="SL.TLF.CACT.FE.NE.ZS") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
 gs_2 <- gs_contra %>%
@@ -84,13 +90,15 @@ wdigs <- wdi_2 %>% left_join(gs_2, by=c("country"="country", "year"="year"))
 names(wdigs) <- c("country", "year", "GDP_PC", "GDP_Growth", "Life_Expectancy", "Modern_Contraceptive_Prevalence", "Female_Bachelor", "Male_Bachelor", "Female_Labor")
 ```
 
-Model Female Labor Force % against WDI vars. Then model Contraceptive Prevalence against WDI vars. Then model Fem Bachelors against WDI and Male Bachelors.
+Visualize Female Employment rate against some WDI vars
 
 ```{r}
-cases1 <- wdigs %>% select(country, year, GDP_PC, GDP_Growth, Life_Expectancy, Female_Labor) %>% na.omit() %>% group_by(country) %>% summarise(avg_GDP_PC = mean(GDP_PC), avg_Growth = mean(GDP_Growth), lifetime=mean(Life_Expectancy), F_employment = mean(Female_Labor))
-cases2 <- wdigs %>% select(country, year, GDP_PC, GDP_Growth, Life_Expectancy, Modern_Contraceptive_Prevalence) %>% na.omit()
-cases3 <- wdigs %>% select(country, year, GDP_PC, GDP_Growth, Life_Expectancy, Female_Bachelor, Male_Bachelor) %>% na.omit()
+cases1 <- wdigs %>% 
+  select(country, year, GDP_PC, GDP_Growth, Life_Expectancy, Female_Labor) %>% 
+  na.omit() %>% group_by(country) %>% 
+  summarise(avg_GDP_PC = mean(GDP_PC), avg_Growth = mean(GDP_Growth), lifetime=mean(Life_Expectancy), F_employment = mean(Female_Labor))
 
+ggplot(data=cases1,aes(x=avg_GDP_PC,y=F_employment))+geom_point()+aes(size=lifetime) + stat_smooth(method=lm) + xlab("Average GDP per Capita") + ylab("Female % of Workforce")
 ```
 
 
