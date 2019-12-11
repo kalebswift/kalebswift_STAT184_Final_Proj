@@ -15,8 +15,8 @@ library(tidyr)
 load the data
 
 ```{r}
-wdi_data <- read.csv("1d48ebc2-08c8-4f8b-b2a6-9d2513b6fdc8_Data.csv", header=TRUE)
-gs_data <- read.csv("8f79c865-4e73-43e3-a534-351fdca8f75d_Data.csv", header=TRUE)
+wdi_data <- read.csv("5422156d-7638-42dd-85e4-2aaf0a8ae0b6_Data.csv", header=TRUE, na.strings=c("","NA","..", " "))
+gs_data <- read.csv("8f79c865-4e73-43e3-a534-351fdca8f75d_Data.csv", header=TRUE, na.strings=c("","NA","..", " "))
 ```
 
 
@@ -31,11 +31,11 @@ gs_data %>% na.omit() %>% nrow()
 explore the data
 
 ```{r}
-wdi <- wdi_data %>% na.omit() %>% 
+wdi <- wdi_data %>% 
   select(Country.Name, Series.Name, Series.Code, X2009..YR2009., X2010..YR2010., X2011..YR2011., X2012..YR2012., X2013..YR2013., X2014..YR2014., X2015..YR2015., X2016..YR2016., X2017..YR2017., X2018..YR2018.) %>%
   mutate(yr2009=X2009..YR2009., yr2010=X2010..YR2010., yr2011=X2011..YR2011., yr2012=X2012..YR2012., yr2013=X2013..YR2013., yr2014=X2014..YR2014., yr2015=X2015..YR2015., yr2016=X2016..YR2016., yr2017=X2017..YR2017., yr2018=X2018..YR2018., country=Country.Name, series=Series.Name, code=Series.Code) %>%
   select(country, series, code, yr2009, yr2010, yr2011, yr2012, yr2012, yr2013, yr2014, yr2014, yr2015, yr2016, yr2017, yr2018)
-gs <- gs_data %>% na.omit() %>%
+gs <- gs_data %>%
   select(Country.Name, Series.Name, Series.Code, X2009..YR2009., X2010..YR2010., X2011..YR2011., X2012..YR2012., X2013..YR2013., X2014..YR2014., X2015..YR2015., X2016..YR2016., X2017..YR2017., X2018..YR2018.) %>%
   mutate(yr2009=X2009..YR2009., yr2010=X2010..YR2010., yr2011=X2011..YR2011., yr2012=X2012..YR2012., yr2013=X2013..YR2013., yr2014=X2014..YR2014., yr2015=X2015..YR2015., yr2016=X2016..YR2016., yr2017=X2017..YR2017., yr2018=X2018..YR2018., country=Country.Name, series=Series.Name, code=Series.Code) %>%
   select(country, series, code, yr2009, yr2010, yr2011, yr2012, yr2012, yr2013, yr2014, yr2014, yr2015, yr2016, yr2017, yr2018)
@@ -48,7 +48,7 @@ wrangle the data into a single table
 
 | code=="NY.GDP.MKTP.KD.ZG" | code=="SP.DYN.LE00.IN"
 ```{r}
-wdi_GDP <- wdi %>% filter(code=="NY.GDP.MKTP.CD") %>%
+wdi_GDP <- wdi %>% filter(code=="NY.GDP.PCAP.PP.CD") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
 wdi_growth <- wdi %>% filter(code=="NY.GDP.MKTP.KD.ZG") %>%
@@ -58,8 +58,8 @@ wdi_life <- wdi %>% filter(code=="SP.DYN.LE00.IN") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
 wdi_2 <- wdi_GDP %>% left_join(wdi_growth, by=c("country"="country", "yr"="yr")) %>% 
-  left_join(wdi_life, by=c("country"="country", "yr"="yr")) %>% mutate(year = substring(yr, 2)) %>%
-  select(country, year, `GDP (current US$)`, `GDP growth (annual %)`, `Life expectancy at birth, total (years)`)
+  left_join(wdi_life, by=c("country"="country", "yr"="yr")) %>% mutate(year = as.numeric(substring(yr, 3))) %>%
+  select(country, year, `GDP per capita, PPP (current international $)`, `GDP growth (annual %)`, `Life expectancy at birth, total (years)`)
 
 gs_contra <- gs %>% filter(code=="SP.DYN.CONM.ZS") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
@@ -76,17 +76,22 @@ gs_labor <- gs %>% filter(code=="SL.TLF.CACT.FE.NE.ZS") %>%
 gs_2 <- gs_contra %>%
   left_join(gs_femBach, by=c("country"="country", "yr"="yr")) %>%
   left_join(gs_maleBach, by=c("country"="country", "yr"="yr")) %>%
-  left_join(gs_labor, by=c("country"="country", "yr"="yr")) %>% mutate(year = substring(yr, 2)) %>%
+  left_join(gs_labor, by=c("country"="country", "yr"="yr")) %>% mutate(year = as.numeric(substring(yr, 3))) %>%
   select(country, year, `Contraceptive prevalence, modern methods (% of women ages 15-49)`, "Educational attainment, at least Bachelor's or equivalent, population 25+, female (%) (cumulative)",	
 "Educational attainment, at least Bachelor's or equivalent, population 25+, male (%) (cumulative)", `Labor force participation rate, female (% of female population ages 15+) (national estimate)`)
 
-wdigs <- wdi_2 %>% left_join(gs_2, by=c("country"="country", "yr"="yr"))
-View(wdigs)
+wdigs <- wdi_2 %>% left_join(gs_2, by=c("country"="country", "year"="year"))
+names(wdigs) <- c("country", "year", "GDP_PC", "GDP_Growth", "Life_Expectancy", "Modern_Contraceptive_Prevalence", "Female_Bachelor", "Male_Bachelor", "Female_Labor")
 ```
 
+Model Female Labor Force % against WDI vars. Then model Contraceptive Prevalence against WDI vars. Then model Fem Bachelors against WDI and Male Bachelors.
 
+```{r}
+cases1 <- wdigs %>% select(country, year, GDP_PC, GDP_Growth, Life_Expectancy, Female_Labor) %>% na.omit() %>% group_by(country) %>% summarise(avg_GDP_PC = mean(GDP_PC), avg_Growth = mean(GDP_Growth), lifetime=mean(Life_Expectancy), F_employment = mean(Female_Labor))
+cases2 <- wdigs %>% select(country, year, GDP_PC, GDP_Growth, Life_Expectancy, Modern_Contraceptive_Prevalence) %>% na.omit()
+cases3 <- wdigs %>% select(country, year, GDP_PC, GDP_Growth, Life_Expectancy, Female_Bachelor, Male_Bachelor) %>% na.omit()
 
-
+```
 
 
 
