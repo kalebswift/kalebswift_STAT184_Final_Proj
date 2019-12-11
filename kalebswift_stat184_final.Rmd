@@ -32,10 +32,12 @@ explore the data
 
 ```{r}
 wdi <- wdi_data %>% 
+  filter(grepl("([.]*\\.)*[.]*", Series.Code)) %>%
   select(Country.Name, Series.Name, Series.Code, X2009..YR2009., X2010..YR2010., X2011..YR2011., X2012..YR2012., X2013..YR2013., X2014..YR2014., X2015..YR2015., X2016..YR2016., X2017..YR2017., X2018..YR2018.) %>%
   mutate(yr2009=X2009..YR2009., yr2010=X2010..YR2010., yr2011=X2011..YR2011., yr2012=X2012..YR2012., yr2013=X2013..YR2013., yr2014=X2014..YR2014., yr2015=X2015..YR2015., yr2016=X2016..YR2016., yr2017=X2017..YR2017., yr2018=X2018..YR2018., country=Country.Name, series=Series.Name, code=Series.Code) %>%
   select(country, series, code, yr2009, yr2010, yr2011, yr2012, yr2012, yr2013, yr2014, yr2014, yr2015, yr2016, yr2017, yr2018)
 gs <- gs_data %>%
+  filter(grepl("([.]*\\.)*[.]*", Series.Code)) %>%
   select(Country.Name, Series.Name, Series.Code, X2009..YR2009., X2010..YR2010., X2011..YR2011., X2012..YR2012., X2013..YR2013., X2014..YR2014., X2015..YR2015., X2016..YR2016., X2017..YR2017., X2018..YR2018.) %>%
   mutate(yr2009=X2009..YR2009., yr2010=X2010..YR2010., yr2011=X2011..YR2011., yr2012=X2012..YR2012., yr2013=X2013..YR2013., yr2014=X2014..YR2014., yr2015=X2015..YR2015., yr2016=X2016..YR2016., yr2017=X2017..YR2017., yr2018=X2018..YR2018., country=Country.Name, series=Series.Name, code=Series.Code) %>%
   select(country, series, code, yr2009, yr2010, yr2011, yr2012, yr2012, yr2013, yr2014, yr2014, yr2015, yr2016, yr2017, yr2018)
