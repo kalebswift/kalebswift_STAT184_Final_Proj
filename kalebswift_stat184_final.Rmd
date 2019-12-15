@@ -1,41 +1,52 @@
 ---
-title: "R Notebook"
+title: "Kaleb Swift: STAT 184 Final Project"
 output: html_notebook
 ---
 
-import libraries here
 
+## Guiding Question
+
+My guiding question in this project was: do more developed countries have more women's rights? By intuition, I believe that more developed nations would tend to have higher GDP per captita, national GDP growth, and higher life expectancies, so I paid extra attention to those variables when looking at the data table of World Development Indicators. Also by intuition, I believe that countries with more women's rights would tend to have a higher prevalence of modern contraceptive methods, women having higher education (for example, at least a Bachelor's degree) at a rate more similar to that of men, and a higher percentage of women would be in the work force. Because of this, I looked for those variables in the Gender Statistics data table.
+
+## The Data
+
+
+Here, I load the necessary packages for this project.
 ```{r}
 library(DataComputing)
-install.packages("party")
 library(tidyr)
 ```
 
 
-load the data
-
+Here, I load the data. It is from the World Bank website's free data tables page.
 ```{r}
 wdi_data <- read.csv("5422156d-7638-42dd-85e4-2aaf0a8ae0b6_Data.csv", header=TRUE, na.strings=c("","NA","..", " "))
 gs_data <- read.csv("8f79c865-4e73-43e3-a534-351fdca8f75d_Data.csv", header=TRUE, na.strings=c("","NA","..", " "))
 ```
 
 
-examine the number of rows in each
-
+Here, I examine the number of rows in each column and peek at the heads of the data tables.
 ```{r}
 wdi_data %>% na.omit() %>% nrow()
 gs_data %>% na.omit() %>% nrow()
+
+head(wdi_data)
+head(gs_data)
 ```
 
+## Data Wrangling
 
-explore the data
 
+Here, I trim out the country code so that the data tables are a little easier to look at. I do this by selecting everything but the country code. I also made sure to select things in the same order so the two tables would appear more similar. When viewing wdi_data and gs_data, I also noticed that there were some rows that didn't have a series or code, or at least had some other gibberish. To remedy this, I created a RE to filter out all rows that had something in the Series.code variable that were not of the proper form. 
 ```{r}
+# wdi_data with everything but country code. Preparing for the next step.
 wdi <- wdi_data %>% 
   filter(grepl("([.]*\\.)*[.]*", Series.Code)) %>%
   select(Country.Name, Series.Name, Series.Code, X2009..YR2009., X2010..YR2010., X2011..YR2011., X2012..YR2012., X2013..YR2013., X2014..YR2014., X2015..YR2015., X2016..YR2016., X2017..YR2017., X2018..YR2018.) %>%
   mutate(yr2009=X2009..YR2009., yr2010=X2010..YR2010., yr2011=X2011..YR2011., yr2012=X2012..YR2012., yr2013=X2013..YR2013., yr2014=X2014..YR2014., yr2015=X2015..YR2015., yr2016=X2016..YR2016., yr2017=X2017..YR2017., yr2018=X2018..YR2018., country=Country.Name, series=Series.Name, code=Series.Code) %>%
   select(country, series, code, yr2009, yr2010, yr2011, yr2012, yr2012, yr2013, yr2014, yr2014, yr2015, yr2016, yr2017, yr2018)
+
+# gs_data with everything but country code. Preparing for the next step.
 gs <- gs_data %>%
   filter(grepl("([.]*\\.)*[.]*", Series.Code)) %>%
   select(Country.Name, Series.Name, Series.Code, X2009..YR2009., X2010..YR2010., X2011..YR2011., X2012..YR2012., X2013..YR2013., X2014..YR2014., X2015..YR2015., X2016..YR2016., X2017..YR2017., X2018..YR2018.) %>%
@@ -43,44 +54,61 @@ gs <- gs_data %>%
   select(country, series, code, yr2009, yr2010, yr2011, yr2012, yr2012, yr2013, yr2014, yr2014, yr2015, yr2016, yr2017, yr2018)
 ```
 
-wrangle the data into a single table
 
-| code=="NY.GDP.MKTP.KD.ZG" | code=="SP.DYN.LE00.IN"
+Here, I wrangle the data into a single table: wdigs (because it is a combination of wdi and gs). Each of the smaller tables contains the data I want in regards to a particular series variable. I then join the smaller tables into two larges ones, wdi_2 and gs_2. To make wdigs, I join wdi_2 and gs_2. I now realize that I could have just made wdi_2 and gs_2 in one step each, but I already have everything working perfectly fine in the code below, so I decided to leave it as is.
 ```{r}
+# In each of the following data tables, years are changed to be a single column variable, and each series is made into a separate column variable. When I was performing the data wrangling, I was looking up each variable's code one at a time, and so I made the tables one at a time. I now realize that I could have just made wdi_2 and gs_2 in one step each, but I already have everything working perfectly fine in the code below, so I decided to leave it as is.
+
+# This data table contains data about the GDP per capita for each country in each of the following years. 
 wdi_GDP <- wdi %>% 
   filter(code=="NY.GDP.PCAP.PP.CD") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
+
+# This data table contains data about the % change of national GDP for each country in each of the following years.
 wdi_growth <- wdi %>% 
   filter(code=="NY.GDP.MKTP.KD.ZG") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
+
+# This data table contains data about the life expectancy at birth in each country for each of the following years.
 wdi_life <- wdi %>% 
   filter(code=="SP.DYN.LE00.IN") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
+
+# This data table is a join of the previous three. It also edits the year variable to be just the year number.
 wdi_2 <- wdi_GDP %>% 
   left_join(wdi_growth, by=c("country"="country", "yr"="yr")) %>% 
   left_join(wdi_life, by=c("country"="country", "yr"="yr")) %>% 
   mutate(year = as.numeric(substring(yr, 3))) %>%
   select(country, year, `GDP per capita, PPP (current international $)`, `GDP growth (annual %)`, `Life expectancy at birth, total (years)`)
 
+# This data table contains data about the prevalence of modern contraceptive methods in each country for each of the following years. It ended up being a very sparse data table, so its information is not used in analysis, as na.omit() removes too many rows when using this table.
 gs_contra <- gs %>% 
   filter(code=="SP.DYN.CONM.ZS") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
+
+# This data table contains data about the % of the population that is a woman with at least a Bachelor's degree. It ended up being a very sparse data table, so its information is not used in analysis, as na.omit() removes too many rows when using this table.
 gs_femBach <- gs %>% 
   filter(code=="SE.TER.CUAT.BA.FE.ZS") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
+
+# This data table contains data about the % of the population that is a man with at least a Bachelor's degree. It ended up being a very sparse data table, so its information is not used in analysis, as na.omit() removes too many rows when using this table.
 gs_maleBach <- gs %>% 
   filter(code=="SE.TER.CUAT.BA.MA.ZS") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
+
+# this data table countains data about the % of the (15+) female population that is in the workforce for each country in each of the following years.
 gs_labor <- gs %>% 
   filter(code=="SL.TLF.CACT.FE.NE.ZS") %>%
   gather(key=yr, value=val, yr2009, yr2010, yr2011, yr2012, yr2013, yr2014, yr2015, yr2016, yr2017, yr2018) %>%
   spread(key=series, value=val)
+
+# This data table is a join of the previous four. It also edits the year variable to be just the year number.
 gs_2 <- gs_contra %>%
   left_join(gs_femBach, by=c("country"="country", "yr"="yr")) %>%
   left_join(gs_maleBach, by=c("country"="country", "yr"="yr")) %>%
@@ -88,21 +116,29 @@ gs_2 <- gs_contra %>%
   select(country, year, `Contraceptive prevalence, modern methods (% of women ages 15-49)`, "Educational attainment, at least Bachelor's or equivalent, population 25+, female (%) (cumulative)",	
 "Educational attainment, at least Bachelor's or equivalent, population 25+, male (%) (cumulative)", `Labor force participation rate, female (% of female population ages 15+) (national estimate)`)
 
+# Here, I join wdi_2 and gs_2. I also rename the variables so that they are easier to type.
 wdigs <- wdi_2 %>% left_join(gs_2, by=c("country"="country", "year"="year"))
 names(wdigs) <- c("country", "year", "GDP_PC", "GDP_Growth", "Life_Expectancy", "Modern_Contraceptive_Prevalence", "Female_Bachelor", "Male_Bachelor", "Female_Labor")
 ```
 
-Visualize Female Employment rate against some WDI vars
+Here, I visualize Female Employment rate against GDP per capita and life expectancy. Each dot in the graph is the average of a country's GDP per capita, life expectancy, and female population % participation in the workforce over the years 2009-2018.
 
+The data about Bachelor's degrees and contraceptive prevalence ended up being incredibly sparse, so I felt it was unfortunately necessary to ignore those variables when doing analysis so that I would still have a good number of cases.
 ```{r}
-cases1 <- wdigs %>% 
+# The data about contraceptives and Bachelor's degrees was too sparse, so I decided to make a graph instead of use machine learning. I did my analysis based on GDP per captita, national GDP growth %, life expectancy, and female population % participation in labor. National GDP growth % ended up not being very correlated, so I did not include it in my graph. 
+cases <- wdigs %>% 
   select(country, year, GDP_PC, GDP_Growth, Life_Expectancy, Female_Labor) %>% 
   na.omit() %>% group_by(country) %>% 
   summarise(avg_GDP_PC = mean(GDP_PC), avg_Growth = mean(GDP_Growth), lifetime=mean(Life_Expectancy), F_employment = mean(Female_Labor))
 
-ggplot(data=cases1,aes(x=avg_GDP_PC,y=F_employment))+geom_point()+aes(size=lifetime) + stat_smooth(method=lm) + xlab("Average GDP per Capita") + ylab("Female % of Workforce")
+# Each dot in the graph is the average of a country's GDP per capita, life expectancy, and female population % participation in the workforce over the years 2009-2018.
+ggplot(data=cases,aes(x=avg_GDP_PC,y=F_employment))+geom_point()+aes(size=lifetime) + stat_smooth(method=lm) + xlab("Average GDP per Capita") + ylab("Female % of Workforce")
 ```
 
 
+## Key Takeaway
+
+
+There is a definite trend between a few common inidicatiors of development and female participation in the work force. There are obvious outliers due to cultural reasons (for example, the bottom-right dot is Saudi Arabia), but overall the trend is fairly evident. If the data for the other Gender Statistics variables I chose was less sparse, I would have loved to see how they were correlated with world development as well. 
 
 
