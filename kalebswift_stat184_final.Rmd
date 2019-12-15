@@ -6,7 +6,7 @@ output: html_notebook
 
 ## Guiding Question
 
-My guiding question in this project was: do more developed countries have more women's rights? By intuition, I believe that more developed nations would tend to have higher GDP per captita, national GDP growth, and higher life expectancies, so I paid extra attention to those variables when looking at the data table of World Development Indicators. Also by intuition, I believe that countries with more women's rights would tend to have a higher prevalence of modern contraceptive methods, women having higher education (for example, at least a Bachelor's degree) at a rate more similar to that of men, and a higher percentage of women would be in the work force. Because of this, I looked for those variables in the Gender Statistics data table.
+My guiding question in this project was: do more developed countries have more women's rights? By intuition, I believe that more developed nations would tend to have higher GDP per captita, national GDP growth, and higher life expectancies, so I paid extra attention to those variables when looking at the data table of World Development Indicators (WDI). Also by intuition, I believe that countries with more women's rights would tend to have a higher prevalence of modern contraceptive methods, women having higher education (for example, at least a Bachelor's degree) at a rate more similar to that of men, and a higher percentage of women would be in the work force. Because of this, I looked for those variables in the Gender Statistics data table (GS).
 
 ## The Data
 
@@ -56,6 +56,10 @@ gs <- gs_data %>%
 
 
 Here, I wrangle the data into a single table: wdigs (because it is a combination of wdi and gs). Each of the smaller tables contains the data I want in regards to a particular series variable. I then join the smaller tables into two larges ones, wdi_2 and gs_2. To make wdigs, I join wdi_2 and gs_2. I now realize that I could have just made wdi_2 and gs_2 in one step each, but I already have everything working perfectly fine in the code below, so I decided to leave it as is.
+
+For WDI variables, I looked at GDP per capita (wdi_GDP), national GDP growth (wdi_growth), and life expectancy (wdi_life).
+
+For GS variables, I looked at contraceptive prevalence (gs_contra), female Bachelor's degree ratio to population (gs_femBach), male Bachelor's degree ration to population (gs_maleBach), and the percentage of the female population in the work force (gs_labor).
 ```{r}
 # In each of the following data tables, years are changed to be a single column variable, and each series is made into a separate column variable. When I was performing the data wrangling, I was looking up each variable's code one at a time, and so I made the tables one at a time. I now realize that I could have just made wdi_2 and gs_2 in one step each, but I already have everything working perfectly fine in the code below, so I decided to leave it as is.
 
@@ -112,7 +116,8 @@ gs_labor <- gs %>%
 gs_2 <- gs_contra %>%
   left_join(gs_femBach, by=c("country"="country", "yr"="yr")) %>%
   left_join(gs_maleBach, by=c("country"="country", "yr"="yr")) %>%
-  left_join(gs_labor, by=c("country"="country", "yr"="yr")) %>% mutate(year = as.numeric(substring(yr, 3))) %>%
+  left_join(gs_labor, by=c("country"="country", "yr"="yr")) %>% 
+  mutate(year = as.numeric(substring(yr, 3))) %>%
   select(country, year, `Contraceptive prevalence, modern methods (% of women ages 15-49)`, "Educational attainment, at least Bachelor's or equivalent, population 25+, female (%) (cumulative)",	
 "Educational attainment, at least Bachelor's or equivalent, population 25+, male (%) (cumulative)", `Labor force participation rate, female (% of female population ages 15+) (national estimate)`)
 
